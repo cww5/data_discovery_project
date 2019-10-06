@@ -12,8 +12,8 @@ Help users visually understand these links and also understand what information 
 
 ## TODO
 
-[x] Initialize repo
-[ ] Build project requirements
+- [x] Initialize repo
+- [ ] Build project requirements
 
 # Getting Started
 
