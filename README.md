@@ -13,7 +13,11 @@ Help users visually understand these links and also understand what information 
 ## TODO
 
 - [x] Initialize repo
-- [ ] Build project requirements
+- [x] Build project requirements
+- [x] Narrow down data sets
+- [ ] Come up with a design for the application
+- [ ] Come up with 3 designs for the application
+- [ ] Present final prodct
 
 # Getting Started
 
