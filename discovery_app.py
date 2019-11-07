@@ -18,8 +18,10 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-data_file = 'C:\\Users\\watson\\Documents\\GitHub\\data_discovery_project\\datasets\\yearly_data.csv'
-df = pd.read_csv(data_file, index_col=0)
+data_path = 'C:\\Users\\watson\\Documents\\GitHub\\data_discovery_project\\datasets\\'
+data_file = data_path + 'yearly_data.csv'
+stan_file = data_path + 'yearly_stan_data.csv'
+df = pd.read_csv(stan_file, index_col=0)
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 df_columns = list(df.columns)
