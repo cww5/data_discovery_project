@@ -15,7 +15,7 @@ Help users visually understand these links and also understand what information 
 - [x] Initialize repo
 - [x] Build project requirements
 - [x] Narrow down data sets
-- [ ] Come up with a design for the application
+- [x] Come up with a design for the application
 - [ ] Come up with 3 designs for the application
 - [ ] Present final prodct
 
