@@ -22,6 +22,7 @@ data_path = 'C:\\Users\\watson\\Documents\\GitHub\\data_discovery_project\\datas
 num_file = data_path + 'yearly_numeric_data.csv'
 stan_file = data_path + 'yearly_stan_data.csv'
 num_df = pd.read_csv(num_file, index_col=0)
+num_df['year'] = num_df['year'].astype(int)
 stan_df = pd.read_csv(stan_file, index_col=0)
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -42,6 +43,18 @@ def make_graph(graph_id, opts, df):
             'data': [
                 {'x': df['year'], 'y': df[opt], 'type': 'line', 'name': opt}
                 for opt in opts
+            ],
+            'layout': {'title': 'Yearly Data', 'legend':{'orientation':'h'}}
+        },
+        animate=False
+    )
+
+def make_scatter(graph_id, x_axis, y_axis, df):
+    return dcc.Graph(
+        id=graph_id,
+        figure={
+            'data': [
+                {'x': df[x_axis], 'y': df[y_axis], 'mode':'markers'}#, 'name': opt, 'type': 'line'}
             ],
             'layout': {'title': 'Yearly Data', 'legend':{'orientation':'h'}}
         },
@@ -117,8 +130,8 @@ app.layout = html.Div(children=[
 
         html.Br(),
 
-        html.Div(id='min-year', children='', style={'display':'none'}),
-        html.Div(id='max-year', children='', style={'display':'none'}),
+        html.Div(id='min-year', style={'display':'none'}),
+        html.Div(id='max-year', style={'display':'none'}),
         
         html.Div(
             html.Div(
@@ -138,13 +151,13 @@ app.layout = html.Div(children=[
         dcc.Dropdown(
             id='select-y',
             options=drop_options,
-            value=['new_york_city_population'],
+            value='new_york_city_population',
             multi=False
         ),
         dcc.Dropdown(
             id='select-x',
             options=drop_options,
-            value=['nyc_consumption_million_gallons_per_day'],
+            value='nyc_consumption_million_gallons_per_day',
             multi=False
         ),
         html.Div(id='graph-2'),
@@ -159,21 +172,29 @@ def update_options(options_selected):
     #options_selected is the list of dropdown options
     my_graph = make_graph('yearly-data', options_selected, stan_df)
     return my_graph
-
+"""
 @app.callback(
     Output('graph-2', 'children'),
     [Input('year-slider', 'value')])
 def update_years_output(value):
     return 'You have selected "{}"'.format(value)
-
+"""
 @app.callback(
     [Output('min-year', 'children'),
-     Output('max-year', 'children')],
+     Output('max-year', 'children'),
+     Output('graph-2', 'children')],
     [Input('select-x', 'value'),
-     Input('select-y', 'value')]
+     Input('select-y', 'value'),
+     Input('year-slider', 'value')]
     )
-def update_graph_2(x_label, y_label):
-    return pass
+def update_graph_2(x, y, year_range):
+    temp_df = num_df[(num_df[x].notnull()) & (num_df[y].notnull())][['year',x,y]]
+    temp_df2 = temp_df.loc[(temp_df['year'].isin(range(int(year_range[0]), int(year_range[1]))))]
+    years = sorted(temp_df['year'].values)
+    year0, year1 = str(years[0]), str(years[-1])
+    my_graph = make_scatter('year-by-year-data', x, y, temp_df2)
+    #my_graph = 'you have selected: {}'.format(year_range)
+    return year0, year1, my_graph
 
 
 def main():
