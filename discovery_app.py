@@ -54,7 +54,8 @@ def make_scatter(graph_id, x_axis, y_axis, df):
         id=graph_id,
         figure={
             'data': [
-                {'x': df[x_axis], 'y': df[y_axis], 'mode':'markers'}#, 'name': opt, 'type': 'line'}
+                {'x': df[x_axis], 'y': df[y_axis], 'mode':'markers',
+                 'text':df['year']}
             ],
             'layout': {'title': 'Yearly Data', 'legend':{'orientation':'h'}}
         },
