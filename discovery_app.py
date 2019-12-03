@@ -34,9 +34,9 @@ drop_options = [{'value':col, 'label':' '.join(col.lower().split('_'))} for col 
 full_df = num_df[num_df.columns[num_df.notnull().all()]]
 years = sorted(full_df['year'].values)
 
-print(type(years[0]))
-print(years)
-def make_graph(graph_id, opts, df):
+#print(type(years[0]))
+#print(years)
+def make_graph(graph_id, opts, df, title):
     return dcc.Graph(
         id=graph_id,
         figure={
@@ -44,12 +44,12 @@ def make_graph(graph_id, opts, df):
                 {'x': df['year'], 'y': df[opt], 'type': 'line', 'name': opt}
                 for opt in opts
             ],
-            'layout': {'title': 'Yearly Data', 'legend':{'orientation':'h'}}
+            'layout': {'title': title, 'legend':{'orientation':'h'}}
         },
         animate=False
     )
 
-def make_scatter(graph_id, x_axis, y_axis, df):
+def make_scatter(graph_id, x_axis, y_axis, df, title):
     return dcc.Graph(
         id=graph_id,
         figure={
@@ -57,12 +57,12 @@ def make_scatter(graph_id, x_axis, y_axis, df):
                 {'x': df[x_axis], 'y': df[y_axis], 'mode':'markers',
                  'text':df['year']}
             ],
-            'layout': {'title': 'Yearly Data', 'legend':{'orientation':'h'}}
+            'layout': {'title': title, 'legend':{'orientation':'h'}}
         },
         animate=False
     )
 
-app.layout = html.Div(children=[
+app.layout = html.Div(children=[  #outer div
     html.Div(children=[
         html.H1(children='Data Discovery'),
         html.H3(children='Finding Relationships Amongst Disparate Data Sets'),
@@ -113,7 +113,7 @@ app.layout = html.Div(children=[
         to fall in the range [0,1]. This graph allows you to see the overall trends.
         ''', style={'text-align':'left'}),
         html.Br(),
-        
+    
         dcc.Dropdown(
             id='dropdown-options',
             options=drop_options,
@@ -126,14 +126,14 @@ app.layout = html.Div(children=[
                     #'SCHOOLORGANICTONS'
                     ],
             multi=True
-        ),
+        ), #end dropdown 'dropdown-options'
         html.Div(id='graph-1'),
 
         html.Br(),
 
         html.Div(id='min-year', style={'display':'none'}),
         html.Div(id='max-year', style={'display':'none'}),
-        
+    
         html.Div(
             html.Div(
                 dcc.RangeSlider(
@@ -145,25 +145,33 @@ app.layout = html.Div(children=[
                 style={'width': '600px', 'display': 'inline-block'}
             ),
             style={'text-align': 'center'}
-        ),
-        html.Br(),
-        html.Br(),
+        ), #end outer div containing RangeSlider
         
+        html.Br(),
+        html.Br(),
+    
         dcc.Dropdown(
             id='select-y',
             options=drop_options,
             value='new_york_city_population',
             multi=False
-        ),
+        ), #end dropdown 'select-y'
+        
         dcc.Dropdown(
             id='select-x',
             options=drop_options,
             value='nyc_consumption_million_gallons_per_day',
             multi=False
-        ),
+        ), #end dropdown 'select-x'
+        
         html.Div(id='graph-2'),
-    ], style={'width': '1000px', 'display': 'inline-block'})
-], style={'text-align': 'center'})
+        
+        html.Div(id='graph-3-4', className='row'),
+
+        html.Div(id='graph-5')
+        
+    ], style={'width': '1000px', 'display': 'inline-block'}) #end second outer div
+], style={'text-align': 'center'} )#end outer div
 
 @app.callback(
     Output('graph-1', 'children'),
@@ -171,7 +179,7 @@ app.layout = html.Div(children=[
 )
 def update_options(options_selected):
     #options_selected is the list of dropdown options
-    my_graph = make_graph('yearly-data', options_selected, stan_df)
+    my_graph = make_graph('yearly-data', options_selected, stan_df, 'Yearly Data')
     return my_graph
 """
 @app.callback(
@@ -183,19 +191,34 @@ def update_years_output(value):
 @app.callback(
     [Output('min-year', 'children'),
      Output('max-year', 'children'),
-     Output('graph-2', 'children')],
+     Output('graph-2', 'children'),
+     Output('graph-3-4', 'children')],
     [Input('select-x', 'value'),
      Input('select-y', 'value'),
      Input('year-slider', 'value')]
     )
-def update_graph_2(x, y, year_range):
+def update_graph_2_3_4(x, y, year_range):
     temp_df = num_df[(num_df[x].notnull()) & (num_df[y].notnull())][['year',x,y]]
     temp_df2 = temp_df.loc[(temp_df['year'].isin(range(int(year_range[0]), int(year_range[1]))))]
     years = sorted(temp_df['year'].values)
     year0, year1 = str(years[0]), str(years[-1])
-    my_graph = make_scatter('year-by-year-data', x, y, temp_df2)
+    titl = '{} vs {}'.format(x, y)
+    my_graph2 = make_scatter('year-by-year-data', x, y, temp_df2, titl)
     #my_graph = 'you have selected: {}'.format(year_range)
-    return year0, year1, my_graph
+    my_graph3 = make_scatter('year-by-x-data', 'year', x, temp_df2, x)
+    my_graph4 = make_scatter('year-by-y-data', 'year', y, temp_df2, y)
+    graphs_lst = [
+                    html.Div(children=[my_graph3],
+                        className='six columns'
+                        ),
+                    html.Div(children=[my_graph4],
+                        className='six columns'
+                        )
+    ]
+
+    corr_df = temp_df[[x, y]].corr()
+    
+    return year0, year1, my_graph2, graphs_lst
 
 
 def main():
