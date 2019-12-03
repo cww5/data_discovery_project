@@ -34,6 +34,8 @@ drop_options = [{'value':col, 'label':' '.join(col.lower().split('_'))} for col 
 full_df = num_df[num_df.columns[num_df.notnull().all()]]
 years = sorted(full_df['year'].values)
 
+
+
 #print(type(years[0]))
 #print(years)
 def make_graph(graph_id, opts, df, title):
@@ -68,7 +70,7 @@ def make_heatmap(graph_id, z_data, title):
         z=z_data,
         #x=dates,
         #y=programmers,
-        colorscale='RdBu')
+        colorscale='RdBu', zmid=0)
     )
     graph = dcc.Graph(
         id=graph_id,
