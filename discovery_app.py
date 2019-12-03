@@ -61,6 +61,33 @@ def make_scatter(graph_id, x_axis, y_axis, df, title):
         },
         animate=False
     )
+import plotly.graph_objects as go
+
+def make_heatmap(graph_id, z_data, title):
+    fig = go.Figure(data=go.Heatmap(
+        z=z_data,
+        #x=dates,
+        #y=programmers,
+        colorscale='RdBu')
+    )
+    graph = dcc.Graph(
+        id=graph_id,
+        figure=fig
+    )
+    return graph
+
+    #return dcc.Graph(
+    #    id=graph_id,
+    #    figure={
+    #        'data': [
+    #            {'x': df[x_axis], 'y': df[y_axis], 'mode':'markers',
+    #             'text':df['year']}
+    #        ],
+    #        'layout': {'title': title, 'legend':{'orientation':'h'}}
+    #    },
+    #    animate=False
+    #)
+
 
 app.layout = html.Div(children=[  #outer div
     html.Div(children=[
@@ -192,7 +219,8 @@ def update_years_output(value):
     [Output('min-year', 'children'),
      Output('max-year', 'children'),
      Output('graph-2', 'children'),
-     Output('graph-3-4', 'children')],
+     Output('graph-3-4', 'children'),
+     Output('graph-5', 'children')],
     [Input('select-x', 'value'),
      Input('select-y', 'value'),
      Input('year-slider', 'value')]
@@ -217,8 +245,8 @@ def update_graph_2_3_4(x, y, year_range):
     ]
 
     corr_df = temp_df[[x, y]].corr()
-    
-    return year0, year1, my_graph2, graphs_lst
+    corr_plot = make_heatmap('heatmap-1', corr_df, 'Heatmap Correlation')
+    return year0, year1, my_graph2, graphs_lst, corr_plot
 
 
 def main():
