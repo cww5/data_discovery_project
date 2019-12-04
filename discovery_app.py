@@ -34,11 +34,8 @@ drop_options = [{'value':col, 'label':' '.join(col.lower().split('_'))} for col 
 full_df = num_df[num_df.columns[num_df.notnull().all()]]
 years = sorted(full_df['year'].values)
 
-
 final_environComplaint = pd.read_csv(pri_env_comp)
 final_environComplaint['Date_Received'] = pd.to_datetime(final_environComplaint['Date_Received'])
-
-
 
 def make_graph(graph_id, opts, df, title):
     return dcc.Graph(
@@ -48,12 +45,24 @@ def make_graph(graph_id, opts, df, title):
                 {'x': df['year'], 'y': df[opt], 'type': 'line', 'name': opt}
                 for opt in opts
             ],
-            'layout': {'title': title, 'legend':{'orientation':'h'}}
+            'layout': {'title': title, 'legend':{'orientation':'h', 'y':-0.20},
+                       'xaxis':{'title':'year'},'yaxis':{'title':'trend'}}
         },
         animate=False
     )
 
 def make_scatter(graph_id, x_axis, y_axis, df, title):
+    xp = x_axis.split('_')
+    yp = y_axis.split('_')
+    if len(xp) > 1:
+        x_title = ' '.join(xp[:4])
+    else:
+        x_title = xp[0]
+    if len(yp) > 1:
+        y_title = ' '.join(yp[:4])
+    else:
+        y_title = yp[0]
+    
     return dcc.Graph(
         id=graph_id,
         figure={
@@ -61,18 +70,19 @@ def make_scatter(graph_id, x_axis, y_axis, df, title):
                 {'x': df[x_axis], 'y': df[y_axis], 'mode':'markers',
                  'text':df['year']}
             ],
-            'layout': {'title': title, 'legend':{'orientation':'h'}}
+            'layout': {'title': title, 'legend':{'orientation':'h'},
+                       'xaxis':{'title':x_title},'yaxis':{'title':y_title}}
         },
         animate=False
     )
 
 import plotly.graph_objects as go
 
-def make_heatmap(graph_id, z_data, title):
+def make_heatmap(graph_id, z_data, x_data, y_data, title):
     fig = go.Figure(data=go.Heatmap(
         z=z_data,
-        #x=dates,
-        #y=programmers,
+        x=x_data,
+        y=y_data,
         colorscale='RdBu', zmid=0)
     )
     graph = dcc.Graph(
@@ -240,8 +250,12 @@ app.layout = html.Div(children=[  #outer div
         html.Br(),
         
         html.Div(id='graph-3-4', className='row'), #selectx and selecty
-
+        html.Div(id='graph-34-caption', style={'text-align': 'left'}),
+        html.Br(),
+        
         html.Div(id='graph-5'), #Heatmap Corr between selectx/selecty
+        html.Div(id='graph-5-caption', style={'text-align': 'left'}),
+        html.Br(),
 
 
         dcc.Dropdown(
@@ -277,7 +291,9 @@ def update_years_output(value):
      Output('graph-2', 'children'),
      Output('graph-3-4', 'children'),
      Output('graph-5', 'children'),
-     Output('graph-2-caption', 'children')],
+     Output('graph-2-caption', 'children'),
+     Output('graph-34-caption', 'children'),
+     Output('graph-5-caption', 'children')],
     [Input('select-x', 'value'),
      Input('select-y', 'value'),
      Input('year-slider', 'value')]
@@ -295,20 +311,27 @@ def update_graph_2_3_4(x, y, year_range):
     graphs_lst = [
                     html.Div(children=[my_graph3],
                         className='six columns'
-                        ),
+                    ),
                     html.Div(children=[my_graph4],
                         className='six columns'
-                        )
+                    )
     ]
 
     corr_df = temp_df[[x, y]].corr()
-    corr_plot = make_heatmap('heatmap-1', corr_df, 'Heatmap Correlation')
+    corr_plot = make_heatmap('heatmap-1', corr_df, [x,y], [x,y], 'Heatmap Correlation')
 
     g2_caption = '''
     Plot of '{}' vs '{}', showing the actual data points as they relate to each
     other over time from {} to {}.
     '''.format(x, y, year_range[0], year_range[-1])
-    return year0, year1, my_graph2, graphs_lst, corr_plot, g2_caption
+
+    g34_caption = '''
+    Left plot : '{}' Right plot: '{}', showing the actual data points over time from {} to {}.
+    '''.format(x, y, year_range[0], year_range[-1])
+
+    g5_caption = '''Heatmap showing Pearson correlation between {} and {}'''.format(x, y)
+    
+    return year0, year1, my_graph2, graphs_lst, corr_plot, g2_caption, g34_caption, g5_caption
 
 @app.callback(
     Output('graph-6', 'children'),
