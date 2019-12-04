@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 '''Project: Data Discovery App
-Author: Connor Watson
+Authors: Connor Watson, Priyanka Racharla, Keval Kavle
 
 This application built in Dash by Plotly allows the user to find
 relationships between disparate data sets. It may not be clear,
