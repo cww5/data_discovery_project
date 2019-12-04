@@ -256,8 +256,25 @@ app.layout = html.Div(children=[  #outer div
         html.Div(id='graph-5'), #Heatmap Corr between selectx/selecty
         html.Div(id='graph-5-caption', style={'text-align': 'left'}),
         html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        
 
+        html.Div('''
+        It's interesting to see through out time, how different variables correlate.
+        Perhaps there are many more unknowns for us to discover. Perhaps, temporal
+        trends aren't the only factors on environmental change. Yes, we can see that
+        increasing population generally plays an impact on the other variables, which
+        in turn impacts our environment. But, can location data point to changes as well?
+        ''', style={'text-align': 'left'}),
+        html.Br(),
 
+        html.Div('''
+        
+        ''', style={'text-align': 'left'})
+        html.Br(),
+        
         dcc.Dropdown(
             id='pri-year-selector',
             options=[{'label':str(y), 'value':y} for y in range(2010,2020)],
@@ -326,7 +343,7 @@ def update_graph_2_3_4(x, y, year_range):
     '''.format(x, y, year_range[0], year_range[-1])
 
     g34_caption = '''
-    Left plot : '{}' Right plot: '{}', showing the actual data points over time from {} to {}.
+    Left plot : '{}'      Right plot : '{}', showing the actual data points over time from {} to {}.
     '''.format(x, y, year_range[0], year_range[-1])
 
     g5_caption = '''Heatmap showing Pearson correlation between {} and {}'''.format(x, y)
