@@ -192,8 +192,12 @@ app.layout = html.Div(children=[  #outer div
         In contrast to the plot above, you can select two columns and see their relationship to
         each other. 
         ''', style={'text-align':'left'}),
-
         
+        html.Div(id='graph-2'), #selectx vs selecty
+        html.Br(),
+        html.Div('''Data Source: https://opendata.cityofnewyork.us/''', style={'text-align':'left'}),
+        html.Div(id='graph-2-caption', style={'text-align':'left'}),
+
         html.Div(id='min-year', style={'display':'none'}),
         html.Div(id='max-year', style={'display':'none'}),
     
@@ -212,9 +216,6 @@ app.layout = html.Div(children=[  #outer div
         
         html.Br(),
         
-        html.Div(id='graph-2'), #selectx vs selecty
-        html.Br(),
-
         html.Div(id='dropdowns', children=[
             html.Div(
                 dcc.Dropdown(
@@ -275,7 +276,8 @@ def update_years_output(value):
      Output('max-year', 'children'),
      Output('graph-2', 'children'),
      Output('graph-3-4', 'children'),
-     Output('graph-5', 'children')],
+     Output('graph-5', 'children'),
+     Output('graph-2-caption', 'children')],
     [Input('select-x', 'value'),
      Input('select-y', 'value'),
      Input('year-slider', 'value')]
@@ -301,7 +303,12 @@ def update_graph_2_3_4(x, y, year_range):
 
     corr_df = temp_df[[x, y]].corr()
     corr_plot = make_heatmap('heatmap-1', corr_df, 'Heatmap Correlation')
-    return year0, year1, my_graph2, graphs_lst, corr_plot
+
+    g2_caption = '''
+    Plot of '{}' vs '{}', showing the actual data points as they relate to each
+    other over time from {} to {}.
+    '''.format(x, y, year_range[0], year_range[-1])
+    return year0, year1, my_graph2, graphs_lst, corr_plot, g2_caption
 
 @app.callback(
     Output('graph-6', 'children'),
