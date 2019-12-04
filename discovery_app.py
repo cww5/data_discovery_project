@@ -21,10 +21,10 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 data_path = 'C:\\Users\\watson\\Documents\\GitHub\\data_discovery_project\\datasets\\'
 num_file = data_path + 'yearly_numeric_data.csv'
 stan_file = data_path + 'yearly_stan_data.csv'
+pri_env_comp = data_path + 'pri_env_complaints_by_borough.csv'
 num_df = pd.read_csv(num_file, index_col=0)
 num_df['year'] = num_df['year'].astype(int)
 stan_df = pd.read_csv(stan_file, index_col=0)
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 # df_columns apply for both num_df and stan_df
 df_columns = list(stan_df.columns)
@@ -35,9 +35,11 @@ full_df = num_df[num_df.columns[num_df.notnull().all()]]
 years = sorted(full_df['year'].values)
 
 
+final_environComplaint = pd.read_csv(pri_env_comp)
+final_environComplaint['Date_Received'] = pd.to_datetime(final_environComplaint['Date_Received'])
 
-#print(type(years[0]))
-#print(years)
+
+
 def make_graph(graph_id, opts, df, title):
     return dcc.Graph(
         id=graph_id,
@@ -63,6 +65,7 @@ def make_scatter(graph_id, x_axis, y_axis, df, title):
         },
         animate=False
     )
+
 import plotly.graph_objects as go
 
 def make_heatmap(graph_id, z_data, title):
@@ -78,19 +81,36 @@ def make_heatmap(graph_id, z_data, title):
     )
     return graph
 
-    #return dcc.Graph(
-    #    id=graph_id,
-    #    figure={
-    #        'data': [
-    #            {'x': df[x_axis], 'y': df[y_axis], 'mode':'markers',
-    #             'text':df['year']}
-    #        ],
-    #        'layout': {'title': title, 'legend':{'orientation':'h'}}
-    #    },
-    #    animate=False
-    #)
+def make_bar(nm, xdata, ydata):
+    my_bar = go.Bar(
+        name=nm,
+        x=xdata,
+        y=ydata,
+    )
+    return my_bar
+
+borolist = ['Brooklyn', 'Manhattan', 'Queens', 'Bronx', 'Staten Island']
 
 
+def make_stacked_bars(df, year, comp_types, num_comps):
+    fig = go.Figure(
+        data=[
+            make_bar(comp_types[i], borolist, num_comps[i]) for i in range(len(comp_types))
+        ]
+    )
+    fig.update_layout(
+        title="Overall " + str(year) + " Complaint Types by Borough",
+        xaxis_title="Boroughs",
+        yaxis_title= "Number of Complaints",
+        barmode='stack'
+    )
+    graph = dcc.Graph(
+        id='complaints-graph',
+        figure=fig
+    )
+    return graph
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.layout = html.Div(children=[  #outer div
     html.Div(children=[
         html.H1(children='Data Discovery'),
@@ -156,7 +176,8 @@ app.layout = html.Div(children=[  #outer div
                     ],
             multi=True
         ), #end dropdown 'dropdown-options'
-        html.Div(id='graph-1'),
+        
+        html.Div(id='graph-1'), #standardized data
 
         html.Br(),
 
@@ -193,11 +214,21 @@ app.layout = html.Div(children=[  #outer div
             multi=False
         ), #end dropdown 'select-x'
         
-        html.Div(id='graph-2'),
+        html.Div(id='graph-2'), #selectx vs selecty
         
-        html.Div(id='graph-3-4', className='row'),
+        html.Div(id='graph-3-4', className='row'), #selectx and selecty
 
-        html.Div(id='graph-5')
+        html.Div(id='graph-5'), #Heatmap Corr between selectx/selecty
+
+
+        dcc.Dropdown(
+            id='pri-year-selector',
+            options=[{'label':str(y), 'value':y} for y in range(2010,2020)],
+            value=2019,
+            multi=False
+        ), #select year for graph-6
+        
+        html.Div(id='graph-6') #Priyanka Graph
         
     ], style={'width': '1000px', 'display': 'inline-block'}) #end second outer div
 ], style={'text-align': 'center'} )#end outer div
@@ -249,6 +280,32 @@ def update_graph_2_3_4(x, y, year_range):
     corr_df = temp_df[[x, y]].corr()
     corr_plot = make_heatmap('heatmap-1', corr_df, 'Heatmap Correlation')
     return year0, year1, my_graph2, graphs_lst, corr_plot
+
+@app.callback(
+    Output('graph-6', 'children'),
+    [Input('pri-year-selector', 'value')]
+)
+def functionName(year):
+    environYr = final_environComplaint[final_environComplaint['Date_Received'].dt.year == year]
+
+    complaintType = ['Asbestos', 'Indoor Air Quality', 'Mold','Asbestos/Garbage Nuisance', 'Indoor Sewage','Cooling Tower', 'Lead']
+    numComplaints = [[],[],[],[],[],[],[]]
+    
+    for boro in borolist:
+        boroYr = environYr[environYr['Incident_Address_Borough']==boro]
+        complaintDF = boroYr.groupby('Complaint_Type_311').size()
+        complaintIndex = 0
+        for t in complaintType:
+            try: 
+                typeNum = complaintDF.loc[t]
+                (numComplaints[complaintIndex]).append(typeNum)
+            except: 
+                (numComplaints[complaintIndex]).append(0)
+            complaintIndex += 1
+    
+
+    stacked_bars = make_stacked_bars(environYr, year, complaintType, numComplaints)
+    return stacked_bars
 
 
 def main():
