@@ -116,18 +116,20 @@ app.layout = html.Div(children=[  #outer div
         html.H1(children='Data Discovery'),
         html.H3(children='Finding Relationships Amongst Disparate Data Sets'),
         html.Div(children='By: Connor Watson, Priyanka Racharla, and Keval Kavle'),
-
+        html.Br(),
+        
         html.Div(children='''
         In this application we seek to find relationships amongst data sets
         which seemingly have no relationship. Thanks to recent efforts, we have
         access to lots of New York City data, and we intend to use data-driven story
-        telling to inform the user of yearly trends.
+        telling to inform the user of trends that exist in the data, while allowing
+        for discovery of possibly new trends.
         ''', style={'text-align':'left'}),
         html.Br(),
 
         html.Div(children='''
-        The growth of the human population seems to keep increasing as time
-        goes on. As the Internet has boomed, NYC has become more of a hub
+        The growth of the human population has been increasing as time
+        goes on. In conjunction with the Internet boom, NYC has become more of a hub
         for both jobs and technology. With the increase in population comes
         an increase in effect on the environment as well. People joke about
         the 'dirty Hudson River', but in actuality, the condition of NYC and
@@ -156,12 +158,6 @@ app.layout = html.Div(children=[  #outer div
         acknowledgement by the Department of Education. What else can you discover?
         ''', style={'text-align':'left'}),
         html.Br(),
-
-        html.Div('''
-        NOTE: This graph is NOT to scale. All data points have been standardized
-        to fall in the range [0,1]. This graph allows you to see the overall trends.
-        ''', style={'text-align':'left'}),
-        html.Br(),
     
         dcc.Dropdown(
             id='dropdown-options',
@@ -181,6 +177,23 @@ app.layout = html.Div(children=[  #outer div
 
         html.Br(),
 
+        html.Div('''Data Source: https://opendata.cityofnewyork.us/''', style={'text-align':'left'}),
+        html.Div('''
+        Note: This graph is NOT to scale. All data points have been standardized
+        to fall in the range [0,1]. This graph allows you to see the overall trends across
+        many years.''', style={'text-align':'left'}),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        
+        html.Div('''
+        For a more accurate view, you may want to understand the data in it's most natural form.
+        In contrast to the plot above, you can select two columns and see their relationship to
+        each other. 
+        ''', style={'text-align':'left'}),
+
+        
         html.Div(id='min-year', style={'display':'none'}),
         html.Div(id='max-year', style={'display':'none'}),
     
@@ -198,23 +211,32 @@ app.layout = html.Div(children=[  #outer div
         ), #end outer div containing RangeSlider
         
         html.Br(),
-        html.Br(),
-    
-        dcc.Dropdown(
-            id='select-y',
-            options=drop_options,
-            value='new_york_city_population',
-            multi=False
-        ), #end dropdown 'select-y'
-        
-        dcc.Dropdown(
-            id='select-x',
-            options=drop_options,
-            value='nyc_consumption_million_gallons_per_day',
-            multi=False
-        ), #end dropdown 'select-x'
         
         html.Div(id='graph-2'), #selectx vs selecty
+        html.Br(),
+
+        html.Div(id='dropdowns', children=[
+            html.Div(
+                dcc.Dropdown(
+                    id='select-x',
+                    options=drop_options,
+                    value='new_york_city_population',
+                    multi=False
+                ), #end dropdown 'select-x'
+                className='six columns'
+            ),
+            html.Div(
+                dcc.Dropdown(
+                    id='select-y',
+                    options=drop_options,
+                    value='nyc_consumption_million_gallons_per_day',
+                    multi=False
+                ), #end dropdown 'select-y'
+                className='six columns'
+            )            
+        ], className='row'),
+        
+        html.Br(),
         
         html.Div(id='graph-3-4', className='row'), #selectx and selecty
 
