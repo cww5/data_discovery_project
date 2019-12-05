@@ -126,8 +126,9 @@ app.layout = html.Div(children=[  #outer div
         html.H1(children='Data Discovery'),
         html.H3(children='Finding Relationships Amongst Disparate Data Sets'),
         html.Div(children='By: Connor Watson, Priyanka Racharla, and Keval Kavle'),
+        html.Div('''Data Source: https://opendata.cityofnewyork.us/'''),
         html.Br(),
-        
+           
         html.Div(children='''
         In this application we seek to find relationships amongst data sets
         which seemingly have no relationship. Thanks to recent efforts, we have
@@ -186,14 +187,15 @@ app.layout = html.Div(children=[  #outer div
         html.Div(id='graph-1'), #standardized data
 
         html.Br(),
-
-        html.Div('''Data Source: https://opendata.cityofnewyork.us/''', style={'text-align':'left'}),
+        
+        html.Div('''Figure 1 : Overall trends of multiple data columns throughout time.''', style={'text-align':'left'}),
         html.Div('''
         Note: This graph is NOT to scale. All data points have been standardized
         to fall in the range [0,1]. This graph allows you to see the overall trends across
         many years.''', style={'text-align':'left'}),
         html.Br(),
         html.Br(),
+        html.Div('''----''', style={'text-align':'center'}),
         html.Br(),
         html.Br(),
         
@@ -205,7 +207,7 @@ app.layout = html.Div(children=[  #outer div
         
         html.Div(id='graph-2'), #selectx vs selecty
         html.Br(),
-        html.Div('''Data Source: https://opendata.cityofnewyork.us/''', style={'text-align':'left'}),
+        
         html.Div(id='graph-2-caption', style={'text-align':'left'}),
 
         html.Div(id='min-year', style={'display':'none'}),
@@ -257,6 +259,7 @@ app.layout = html.Div(children=[  #outer div
         html.Div(id='graph-5-caption', style={'text-align': 'left'}),
         html.Br(),
         html.Br(),
+        html.Div('''----''', style={'text-align':'center'}),
         html.Br(),
         html.Br(),
         
@@ -272,7 +275,7 @@ app.layout = html.Div(children=[  #outer div
 
         html.Div('''
         
-        ''', style={'text-align': 'left'})
+        ''', style={'text-align': 'left'}),
         html.Br(),
         
         dcc.Dropdown(
@@ -282,7 +285,8 @@ app.layout = html.Div(children=[  #outer div
             multi=False
         ), #select year for graph-6
         
-        html.Div(id='graph-6') #Priyanka Graph
+        html.Div(id='graph-6'), #Priyanka Graph
+        html.Div(id='graph-6-caption', style={'text-align': 'left'})
         
     ], style={'width': '1000px', 'display': 'inline-block'}) #end second outer div
 ], style={'text-align': 'center'} )#end outer div
@@ -338,20 +342,21 @@ def update_graph_2_3_4(x, y, year_range):
     corr_plot = make_heatmap('heatmap-1', corr_df, [x,y], [x,y], 'Heatmap Correlation')
 
     g2_caption = '''
-    Plot of '{}' vs '{}', showing the actual data points as they relate to each
+    Figure 2 : Plot of '{}' vs '{}', showing the actual data points as they relate to each
     other over time from {} to {}.
     '''.format(x, y, year_range[0], year_range[-1])
 
     g34_caption = '''
-    Left plot : '{}'      Right plot : '{}', showing the actual data points over time from {} to {}.
+    Figure 3 (left) : '{}', Figure 4 (Right) : '{}', showing the actual data points over time from {} to {}.
     '''.format(x, y, year_range[0], year_range[-1])
 
-    g5_caption = '''Heatmap showing Pearson correlation between {} and {}'''.format(x, y)
+    g5_caption = '''Figure 5 : Heatmap showing Pearson correlation between {} and {}'''.format(x, y)
     
     return year0, year1, my_graph2, graphs_lst, corr_plot, g2_caption, g34_caption, g5_caption
 
 @app.callback(
-    Output('graph-6', 'children'),
+    [Output('graph-6', 'children'),
+     Output('graph-6-caption', 'children')],
     [Input('pri-year-selector', 'value')]
 )
 def functionName(year):
@@ -371,10 +376,11 @@ def functionName(year):
             except: 
                 (numComplaints[complaintIndex]).append(0)
             complaintIndex += 1
-    
+
+    g6_caption = '''Figure 6 : Different types of environmental complaints during {}.'''.format(year)
 
     stacked_bars = make_stacked_bars(environYr, year, complaintType, numComplaints)
-    return stacked_bars
+    return stacked_bars, g6_caption
 
 
 def main():
