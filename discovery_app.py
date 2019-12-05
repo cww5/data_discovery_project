@@ -286,7 +286,34 @@ app.layout = html.Div(children=[  #outer div
         ), #select year for graph-6
         
         html.Div(id='graph-6'), #Priyanka Graph
-        html.Div(id='graph-6-caption', style={'text-align': 'left'})
+        html.Div(id='graph-6-caption', style={'text-align': 'left'}),
+        html.Br(),
+
+        html.Div('''
+        As you can see in the above chart, throughout each year, you can compare the amount
+        of indoor complaints for each borough. After messing around with the data sets, you
+        should notice that the bright red color stands out the most. That's because this
+        represents the number of complaints for indoor air quality. So relatively, although
+        each borough has a different population and a different set of residents, it's easy
+        to understand why this color makes sense.
+        ''', style={'text-align': 'left'}),
+        html.Br(),
+
+        html.Div('''
+        If you've ever been to New York City, or visited any of the residential buildings,
+        you would see on average that each building has awful indoor quality. Many people
+        can relate to being inside one of these buildings and feeling grimy, humid, breathing
+        in chemicals of the New York City air; this data makes sense, and speaks to the
+        changing environment. If all of the boroughs have poor indoor air quality, then the
+        outside air must be just as bad if not worse.
+        ''', style={'text-align': 'left'}),
+        html.Br(),
+        html.Br(),
+        html.Div('''----''', style={'text-align':'center'}),
+        html.Br(),
+        html.Br()
+        
+        
         
     ], style={'width': '1000px', 'display': 'inline-block'}) #end second outer div
 ], style={'text-align': 'center'} )#end outer div
