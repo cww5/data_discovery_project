@@ -35,3 +35,4 @@ Help users visually understand these links and also understand what information 
 1) Download final_discovery_app.py
 2) Run the following command: python final_discovery_app.py
 3) Open an Internet Browser and visit the URL given in the CMD. Should be something like: http://127.0.0.1:8050/
+4) Tested/verified with Google Chrome Version 78.0.3904.108 (Official Build) (64-bit)
