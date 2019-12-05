@@ -311,9 +311,18 @@ app.layout = html.Div(children=[  #outer div
         html.Br(),
         html.Div('''----''', style={'text-align':'center'}),
         html.Br(),
-        html.Br()
+        html.Br(),
         
-        
+        html.Div('''
+        As shown, both time and space are contributing factors pointing to how the climate is
+        changing. As the population of NYC increases, some factors like the amount of garbage
+        collected or the amount of heating/cooling used per year increases as well. There seems
+        to be some hope in recent years, as it seems like the data shows a more consious
+        mindset towards water usage and compound production. But at the same time, per location,
+        the air quality still is the highest contributor to complaints in the five boroughs,
+        so are things really getting better? Looking at the data, what do you think will happen
+        as the years go by, and is NYC really doing a good job of helping to save our planet?
+        ''', style={'text-align': 'left'})
         
     ], style={'width': '1000px', 'display': 'inline-block'}) #end second outer div
 ], style={'text-align': 'center'} )#end outer div
