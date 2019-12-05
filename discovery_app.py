@@ -16,15 +16,25 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import os as os
+import flask
+import glob
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-data_path = 'C:\\Users\\watson\\Documents\\GitHub\\data_discovery_project\\datasets\\'
+data_path = 'C:\\IS698\\finalsubmission\\datasets\\'
 num_file = data_path + 'yearly_numeric_data.csv'
 stan_file = data_path + 'yearly_stan_data.csv'
 pri_env_comp = data_path + 'pri_env_complaints_by_borough.csv'
 num_df = pd.read_csv(num_file, index_col=0)
 num_df['year'] = num_df['year'].astype(int)
 stan_df = pd.read_csv(stan_file, index_col=0)
+
+
+#Image Code
+image_directory = 'C:\\IS698\\finalsubmission\\datasets\\'
+list_of_images = [os.path.basename(x) for x in glob.glob('{}*.png'.format(image_directory))]
+static_image_route = '/static/'
+
 
 # df_columns apply for both num_df and stan_df
 df_columns = list(stan_df.columns)
@@ -126,9 +136,8 @@ app.layout = html.Div(children=[  #outer div
         html.H1(children='Data Discovery'),
         html.H3(children='Finding Relationships Amongst Disparate Data Sets'),
         html.Div(children='By: Connor Watson, Priyanka Racharla, and Keval Kavle'),
-        html.Div('''Data Source: https://opendata.cityofnewyork.us/'''),
         html.Br(),
-           
+        
         html.Div(children='''
         In this application we seek to find relationships amongst data sets
         which seemingly have no relationship. Thanks to recent efforts, we have
@@ -187,15 +196,14 @@ app.layout = html.Div(children=[  #outer div
         html.Div(id='graph-1'), #standardized data
 
         html.Br(),
-        
-        html.Div('''Figure 1 : Overall trends of multiple data columns throughout time.''', style={'text-align':'left'}),
+
+        html.Div('''Data Source: https://opendata.cityofnewyork.us/''', style={'text-align':'left'}),
         html.Div('''
         Note: This graph is NOT to scale. All data points have been standardized
         to fall in the range [0,1]. This graph allows you to see the overall trends across
         many years.''', style={'text-align':'left'}),
         html.Br(),
         html.Br(),
-        html.Div('''----''', style={'text-align':'center'}),
         html.Br(),
         html.Br(),
         
@@ -207,7 +215,7 @@ app.layout = html.Div(children=[  #outer div
         
         html.Div(id='graph-2'), #selectx vs selecty
         html.Br(),
-        
+        html.Div('''Data Source: https://opendata.cityofnewyork.us/''', style={'text-align':'left'}),
         html.Div(id='graph-2-caption', style={'text-align':'left'}),
 
         html.Div(id='min-year', style={'display':'none'}),
@@ -259,7 +267,6 @@ app.layout = html.Div(children=[  #outer div
         html.Div(id='graph-5-caption', style={'text-align': 'left'}),
         html.Br(),
         html.Br(),
-        html.Div('''----''', style={'text-align':'center'}),
         html.Br(),
         html.Br(),
         
@@ -285,44 +292,20 @@ app.layout = html.Div(children=[  #outer div
             multi=False
         ), #select year for graph-6
         
-        html.Div(id='graph-6'), #Priyanka Graph
-        html.Div(id='graph-6-caption', style={'text-align': 'left'}),
+        html.Div(id='graph-6'),  #Priyanka Graph
         html.Br(),
+        #Image Code Starts here
+        html.Div(['''
+                        Let's find out how Safe,in fact, unsafe is NYC? 
+            ''',
+            dcc.Dropdown(
+                id='image-dropdown',
+                options=[{'label': i, 'value': i} for i in list_of_images],
+                value=list_of_images[0]
+            ),
 
-        html.Div('''
-        As you can see in the above chart, throughout each year, you can compare the amount
-        of indoor complaints for each borough. After messing around with the data sets, you
-        should notice that the bright red color stands out the most. That's because this
-        represents the number of complaints for indoor air quality. So relatively, although
-        each borough has a different population and a different set of residents, it's easy
-        to understand why this color makes sense.
-        ''', style={'text-align': 'left'}),
-        html.Br(),
-
-        html.Div('''
-        If you've ever been to New York City, or visited any of the residential buildings,
-        you would see on average that each building has awful indoor quality. Many people
-        can relate to being inside one of these buildings and feeling grimy, humid, breathing
-        in chemicals of the New York City air; this data makes sense, and speaks to the
-        changing environment. If all of the boroughs have poor indoor air quality, then the
-        outside air must be just as bad if not worse.
-        ''', style={'text-align': 'left'}),
-        html.Br(),
-        html.Br(),
-        html.Div('''----''', style={'text-align':'center'}),
-        html.Br(),
-        html.Br(),
-        
-        html.Div('''
-        As shown, both time and space are contributing factors pointing to how the climate is
-        changing. As the population of NYC increases, some factors like the amount of garbage
-        collected or the amount of heating/cooling used per year increases as well. There seems
-        to be some hope in recent years, as it seems like the data shows a more consious
-        mindset towards water usage and compound production. But at the same time, per location,
-        the air quality still is the highest contributor to complaints in the five boroughs,
-        so are things really getting better? Looking at the data, what do you think will happen
-        as the years go by, and is NYC really doing a good job of helping to save our planet?
-        ''', style={'text-align': 'left'})
+            html.Img(id='image') #Image code ends here
+        ])
         
     ], style={'width': '1000px', 'display': 'inline-block'}) #end second outer div
 ], style={'text-align': 'center'} )#end outer div
@@ -331,6 +314,9 @@ app.layout = html.Div(children=[  #outer div
     Output('graph-1', 'children'),
     [Input('dropdown-options', 'value')],
 )
+
+
+
 def update_options(options_selected):
     #options_selected is the list of dropdown options
     my_graph = make_graph('yearly-data', options_selected, stan_df, 'Yearly Data')
@@ -378,23 +364,26 @@ def update_graph_2_3_4(x, y, year_range):
     corr_plot = make_heatmap('heatmap-1', corr_df, [x,y], [x,y], 'Heatmap Correlation')
 
     g2_caption = '''
-    Figure 2 : Plot of '{}' vs '{}', showing the actual data points as they relate to each
+    Plot of '{}' vs '{}', showing the actual data points as they relate to each
     other over time from {} to {}.
     '''.format(x, y, year_range[0], year_range[-1])
 
     g34_caption = '''
-    Figure 3 (left) : '{}', Figure 4 (Right) : '{}', showing the actual data points over time from {} to {}.
+    Left plot : '{}'      Right plot : '{}', showing the actual data points over time from {} to {}.
     '''.format(x, y, year_range[0], year_range[-1])
 
-    g5_caption = '''Figure 5 : Heatmap showing Pearson correlation between {} and {}'''.format(x, y)
+    g5_caption = '''Heatmap showing Pearson correlation between {} and {}'''.format(x, y)
     
     return year0, year1, my_graph2, graphs_lst, corr_plot, g2_caption, g34_caption, g5_caption
 
 @app.callback(
-    [Output('graph-6', 'children'),
-     Output('graph-6-caption', 'children')],
+    Output('graph-6', 'children'),
     [Input('pri-year-selector', 'value')]
 )
+
+
+
+
 def functionName(year):
     environYr = final_environComplaint[final_environComplaint['Date_Received'].dt.year == year]
 
@@ -412,11 +401,34 @@ def functionName(year):
             except: 
                 (numComplaints[complaintIndex]).append(0)
             complaintIndex += 1
-
-    g6_caption = '''Figure 6 : Different types of environmental complaints during {}.'''.format(year)
+    
 
     stacked_bars = make_stacked_bars(environYr, year, complaintType, numComplaints)
-    return stacked_bars, g6_caption
+    return stacked_bars
+
+
+
+#Image Code starts here
+
+@app.callback(
+    dash.dependencies.Output('image', 'src'),
+    [dash.dependencies.Input('image-dropdown', 'value')])
+
+def update_image_src(value):
+    return static_image_route + value
+
+# Add a static image route that serves images from desktop
+# Be *very* careful here - you don't want to serve arbitrary files
+# from your computer or server
+@app.server.route('{}<image_path>.png'.format(static_image_route))
+def serve_image(image_path):
+    image_name = '{}.png'.format(image_path)
+    if image_name not in list_of_images:
+        raise Exception('"{}" is excluded from the allowed static files'.format(image_path))
+    return flask.send_from_directory(image_directory, image_name)
+
+#Image code ends here
+
 
 
 def main():
