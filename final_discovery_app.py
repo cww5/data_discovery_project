@@ -51,7 +51,7 @@ def make_graph(graph_id, opts, df, title):
         animate=False
     )
 
-def make_scatter(graph_id, x_axis, y_axis, df, title):
+def make_scatter(graph_id, x_axis, y_axis, df, title, mode='markers'):
     xp = x_axis.split('_')
     yp = y_axis.split('_')
     if len(xp) > 1:
@@ -67,7 +67,7 @@ def make_scatter(graph_id, x_axis, y_axis, df, title):
         id=graph_id,
         figure={
             'data': [
-                {'x': df[x_axis], 'y': df[y_axis], 'mode':'markers',
+                {'x': df[x_axis], 'y': df[y_axis], 'mode':mode,
                  'text':df['year']}
             ],
             'layout': {'title': title, 'legend':{'orientation':'h'},
@@ -363,8 +363,8 @@ def update_graph_2_3_4(x, y, year_range):
     titl = '{} vs {}'.format(x, y)
     my_graph2 = make_scatter('year-by-year-data', x, y, temp_df2, titl)
     #my_graph = 'you have selected: {}'.format(year_range)
-    my_graph3 = make_scatter('year-by-x-data', 'year', x, temp_df2, x)
-    my_graph4 = make_scatter('year-by-y-data', 'year', y, temp_df2, y)
+    my_graph3 = make_scatter('year-by-x-data', 'year', x, temp_df2, x, mode='line')
+    my_graph4 = make_scatter('year-by-y-data', 'year', y, temp_df2, y, mode='line')
     graphs_lst = [
                     html.Div(children=[my_graph3],
                         className='six columns'
