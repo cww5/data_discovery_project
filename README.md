@@ -20,7 +20,7 @@ Help users visually understand these links and also understand what information 
 - [x] Narrow down data sets
 - [x] Come up with a design for the application
 - [x] Come up with 3 designs for the application
-- [ ] Present final product
+- [x] Present final product
 
 # Getting Started
 
